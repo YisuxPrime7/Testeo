@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://d1ycf7qrv6dj"]
+
+[ext_resource type="Script" uid="uid://brm8q1dhycfpp" path="res://Códigos/midas_bullet.gd" id="1_acj6m"]
+[ext_resource type="Texture2D" uid="uid://dc1cxjgkl1kwc" path="res://Midas_Bullet-Sheet.png" id="1_nnowv"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_acj6m"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8i2dv"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kcfkr"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8pxx0"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jww5k"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_daqmt"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8ugje"]
+atlas = ExtResource("1_nnowv")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xi0up"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_acj6m")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8i2dv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kcfkr")
+}],
+"loop": 1,
+"name": &"Impact",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8pxx0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jww5k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_daqmt")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8ugje")
+}],
+"loop": 1,
+"name": &"Shoot",
+"speed": 14.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_parow"]
+size = Vector2(12, 7)
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=1875003473]
+position = Vector2(16, 54)
+script = ExtResource("1_acj6m")
+speed = 100.0
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=759797794]
+sprite_frames = SubResource("SpriteFrames_xi0up")
+animation = &"Shoot"
+frame = 3
+frame_progress = 0.7664796
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1422795627]
+visible = false
+position = Vector2(0, 0.5)
+shape = SubResource("RectangleShape2D_parow")
