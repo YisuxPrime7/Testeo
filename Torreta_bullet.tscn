@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://be0k5pui134md"]
+
+[ext_resource type="Script" uid="uid://wq7j6ekix08s" path="res://Códigos/Torreta_bullet.gd" id="1_iqiu7"]
+[ext_resource type="Texture2D" uid="uid://d27yx6gr14vvq" path="res://Torreta_bullet-Sheet.png" id="2_wso8h"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_skct2"]
+atlas = ExtResource("2_wso8h")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_p27i5"]
+atlas = ExtResource("2_wso8h")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y5a4c"]
+atlas = ExtResource("2_wso8h")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ie7p1"]
+atlas = ExtResource("2_wso8h")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xi0up"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_skct2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_p27i5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y5a4c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ie7p1")
+}],
+"loop": 1,
+"name": &"Bullet",
+"speed": 9.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_parow"]
+size = Vector2(27, 12)
+
+[node name="CharacterBody2D" type="CharacterBody2D" unique_id=633899593 groups=["Enemy_Bullet"]]
+position = Vector2(153, 69)
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("1_iqiu7")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=76857674]
+sprite_frames = SubResource("SpriteFrames_xi0up")
+animation = &"Bullet"
+frame = 3
+frame_progress = 0.1089915
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="." unique_id=2106981856]
+visible = false
+polygon = PackedVector2Array(-15, 3, -15, -1, -15, -1, -9, -5, -9, -5, 0, -5, 11, 0, 11, 1, 0, 7, 0, 7, -10, 7)
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1299005665]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=1772212825]
+position = Vector2(-1.5, 1)
+shape = SubResource("RectangleShape2D_parow")
+
+[connection signal="area_entered" from="Area2D" to="." method="_on_area_2d_area_entered"]

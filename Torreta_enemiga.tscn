@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://c4mg8ilgpd634"]
+
+[ext_resource type="Script" uid="uid://ck3pepidjxy6t" path="res://Códigos/torreta_enemiga.gd" id="1_8sqh0"]
+[ext_resource type="Texture2D" uid="uid://l8ikikyf05bf" path="res://Torreta enemiga_Idle-Sheet.png" id="1_hyeo0"]
+[ext_resource type="Texture2D" uid="uid://8x3iyddj8sp2" path="res://Torreta enemiga Shoot-Sheet.png" id="2_8sqh0"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iu11y"]
+atlas = ExtResource("1_hyeo0")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2s76k"]
+atlas = ExtResource("1_hyeo0")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8hpsk"]
+atlas = ExtResource("2_8sqh0")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3m7k2"]
+atlas = ExtResource("2_8sqh0")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f3my1"]
+atlas = ExtResource("2_8sqh0")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_btr0y"]
+atlas = ExtResource("2_8sqh0")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xi0up"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iu11y")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2s76k")
+}],
+"loop": 0,
+"name": &"Idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8hpsk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3m7k2")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f3my1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_btr0y")
+}],
+"loop": 0,
+"name": &"Shoot",
+"speed": 10.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tvr6e"]
+size = Vector2(22, 16.5)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ihtky"]
+size = Vector2(27, 18)
+
+[node name="StaticBody2D" type="StaticBody2D" unique_id=1582408894]
+position = Vector2(136, 69)
+script = ExtResource("1_8sqh0")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1759880250]
+sprite_frames = SubResource("SpriteFrames_xi0up")
+animation = &"Shoot"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=57268902]
+visible = false
+position = Vector2(1, 4.25)
+shape = SubResource("RectangleShape2D_tvr6e")
+
+[node name="HitBox" type="Area2D" parent="." unique_id=320032657]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitBox" unique_id=969298018]
+position = Vector2(0.5, 3)
+shape = SubResource("RectangleShape2D_ihtky")
+debug_color = Color(0.5254902, 0.07058824, 0.12156863, 0.5294118)
+
+[node name="Marker2D" type="Marker2D" parent="." unique_id=1180931662]
+position = Vector2(-19, 2)
+
+[node name="Timer" type="Timer" parent="." unique_id=1790565512]
+wait_time = 3.0
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
