@@ -8,7 +8,7 @@ extends CharacterBody2D
 @onready var hearts_2: Sprite2D = $"CanvasLayer/hearts 2"
 @onready var hearts_1: Sprite2D = $"CanvasLayer/hearts 1"
 @onready var barra_vacía: Sprite2D = $"CanvasLayer/Barra vacía"
-
+@onready var timer_invencibilidad=$Timerinvencibilidad
 
 @onready var bullet = preload("res://Midas_bullet.tscn")
 
@@ -22,30 +22,30 @@ extends CharacterBody2D
 @export var input_buffer_time: float
 @export var corner_correction_amount: float
 
+var direccion_disparo:Vector2=Vector2.RIGHT
 var dash_cooldown = false
 var coyote_timer = 0.0
 var input_buffer_timer = 0.0
 var anim = "Idle"
 var hearts = 3
 
+var move = true
+var arrojar=true
+var gancho
+var disparar=true
+var enganche
+var empuje=50
+var retroceso=false
+var invencibilidad=false
+
 func _physics_process(delta: float) -> void:
-	
-	var direction = Input.get_axis("Left", "Right")
-	
-	if direction != 0:
-		anim = "Run"
-		if direction:
-			velocity.x = speed * direction
-			animation.flip_h=direction<0
-		else:
-			velocity.x = move_toward(velocity.x, 0, speed)
-	else:
-		velocity.x = 0
-		anim = "Idle"
+	if retroceso:
+		move_and_slide()
+		return
 	
 	if Input.is_action_just_pressed("Jump"):
 		input_buffer_timer = input_buffer_time
-		
+	
 	if is_on_floor():
 		coyote_timer = coyote_time
 	
@@ -60,18 +60,36 @@ func _physics_process(delta: float) -> void:
 		velocity.y += gravity * delta
 		coyote_timer -= delta
 		corner_correction()
-	input_buffer_timer -= delta
+		input_buffer_timer -= delta
 		
 		
-	if Input.is_action_just_pressed("Dash"):
+	if Input.is_action_just_pressed("Dash") && move:
 		anim = "Dasheo"
 		is_dashing()
-
+		
+	var direction
+	
+	if arrojar:
+		direction = Input.get_axis("Left", "Right")
+		
+	if direction && direction != 0:
+		anim = "Run"
+		velocity.x = speed * direction
+		animation.flip_h=direction<0
+		
+	else:
+		velocity.x = move_toward(velocity.x, 0, speed)
+		anim = "Idle"
+		
 	move_and_slide()
-	bullet_shoot()
+	
+	direccion_bala()
+			
+	if move:
+		bullet_shoot()
+		
 	update_animation()
 
-	
 func corner_correction():
 	if is_on_wall():
 		return
@@ -81,10 +99,12 @@ func corner_correction():
 		position.x -= corner_correction_amount
 	
 func bullet_shoot():
-	if Input.is_action_just_pressed("Shoot"):
+	if Input.is_action_just_pressed("Shoot") && disparar:
 		var Bullet = bullet.instantiate()
-		get_parent().add_child(Bullet)
+		get_tree().current_scene.add_child(Bullet)
 		Bullet.global_position = $Marker2D.global_position
+		disparar=false
+		$Timer2.start()
 		
 func is_dashing():
 	if dash_cooldown == false:
@@ -102,12 +122,18 @@ func dashing_cooldown():
 func update_animation():
 	animation.play(anim)
 	
-func _on_hitbox_body_entered(body: Node2D) -> void:
-	if body.is_in_group("Enemy_Bullet"):
-		hearts -= 1
-		life_damage()
+func player_curation():
+	hearts += 1
+	life_damage()
+	
+func player_damage():
+	hearts -= 1
+	life_damage()
 		
 func life_damage():
+	if hearts > 3:
+		hearts -= 1
+		
 	if hearts == 3:
 		$"CanvasLayer/hearts 3".visible = true
 		$"CanvasLayer/hearts 2".visible = true
@@ -124,6 +150,55 @@ func life_damage():
 		$"CanvasLayer/hearts 3".visible = false
 		$"CanvasLayer/hearts 2".visible = false
 		$"CanvasLayer/hearts 1".visible = false
-		print("Te moriste perdedor")
 		
+func direccion_bala():
+	var direccion_input=Input.get_axis("Left","Right")
+	
+	if direccion_input!=0:
+		if direccion_input<0:
+			marker_2d.position.x=abs(marker_2d.position.x)*-1
+			direccion_disparo=Vector2.LEFT
+			
+		if direccion_input>0:
+			marker_2d.position.x=abs(marker_2d.position.x)
+			direccion_disparo=Vector2.RIGHT
+
+func _on_timer_timeout() -> void:
+	arrojar=true
+	
+func _on_timer_2_timeout() -> void:
+	disparar=true
+
+func _on_area_2d_body_entered(body: Node2D) -> void:
+	if retroceso || invencibilidad:
+		return
+	if body.is_in_group("enemy"):
+		var direction=(global_position-body.global_position).normalized()
+		velocity=direction*empuje
+		retroceso=true
+		player_damage()
 		
+		if body.has_signal("golpear"):
+			body.golpear.emit()
+		
+		await get_tree().create_timer(0.2).timeout.connect(func(): retroceso=false)
+		
+		invencibilidad=true
+		timer_invencibilidad.start()
+		parpadear()
+
+func _on_timerinvencibilidad_timeout() -> void:
+	invencibilidad=false
+	animation.visible=true
+	
+func parpadear():
+	while invencibilidad:
+		animation.visible=!animation.visible
+		await get_tree().create_timer(0.1).timeout
+
+
+func _on_hitbox_area_shape_entered(area_rid: RID, area: Area2D, area_shape_index: int, local_shape_index: int) -> void:
+	if area.is_in_group("Enemy_Bullet"):
+		player_damage()
+	if area.is_in_group("HitBox"):
+		player_damage()
